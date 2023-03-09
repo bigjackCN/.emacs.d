@@ -59,20 +59,64 @@
   :ensure t
   :config (load-theme 'dracula t))
 
+;; vertico
+(use-package vertico
+  :ensure t
+  :config (vertico-mode))
+
+;; marginalia
+(use-package marginalia
+  :ensure t
+  :config (marginalia-mode))
+
+;; which key
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
+
+;; company
+(use-package company
+  :ensure t
+  :hook ((emacs-lisp-mode . (lambda ()
+			      (setq-local company-backends '(company-elisp))))
+	 (emacs-lisp-mode . company-mode))
+  :config
+  (company-keymap--unbind-quick-access company-active-map)
+  (company-tng-configure-default)
+  (setq company-idle-delay 0.1
+	company-minimum-prefix-length 1))
+
+;; --------------
+;; LSP Settings
+;; --------------
+
+;; lsp mode
+(use-package lsp-mode
+  :ensure t
+  :config
+  (lsp-enable-which-key-integration t))
+
+;; Set up before-save hooks to format buffer and add/delete imports.
+;; Make sure you don't have other gofmt/goimports hooks enabled.
+(defun lsp-go-install-save-hooks ()
+  (add-hook 'before-save-hook #'lsp-format-buffer t t)
+  (add-hook 'before-save-hook #'lsp-organize-imports t t))
+(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+;; Go mode
+(use-package go-mode
+  :ensure t
+  :hook ((go-mode . lsp-deferred)
+	 (go-mode . company-mode))
+  :config
+  (require 'lsp-go)
+  (setq lsp-go-analyses
+	'((fieldalignment . t)
+	  (nilness . t)
+	  (unusedwrite . t)
+	  (unusedparams . t))))
 
 ;; ----------------------------------------
 ;; END Line
 ;; ----------------------------------------
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages '(use-package)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
