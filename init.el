@@ -57,17 +57,20 @@
 ;; load theme
 (use-package dracula-theme
   :ensure t
-  :config (load-theme 'dracula t))
+  :config 
+  (load-theme 'dracula t))
 
 ;; vertico
 (use-package vertico
   :ensure t
-  :config (vertico-mode))
+  :config 
+  (vertico-mode))
 
 ;; marginalia
 (use-package marginalia
   :ensure t
-  :config (marginalia-mode))
+  :config 
+  (marginalia-mode))
 
 ;; which key
 (use-package which-key
