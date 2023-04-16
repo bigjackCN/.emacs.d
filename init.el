@@ -55,10 +55,10 @@
   (package-install 'use-package))
 
 ;; load theme
-(use-package dracula-theme
+(use-package zenburn-theme
   :ensure t
   :config 
-  (load-theme 'dracula t))
+  (load-theme 'zenburn t))
 
 ;; vertico
 (use-package vertico
@@ -90,35 +90,65 @@
   (setq company-idle-delay 0.1
 	company-minimum-prefix-length 1))
 
+;; yapfify
+(use-package yapfify
+  :ensure t
+  :defer t
+  :hook (python-mode . yapf-mode))
+
 ;; --------------
 ;; LSP Settings
 ;; --------------
 
-;; lsp mode
-(use-package lsp-mode
+;; pyvenv
+(use-package pyvenv
+  :ensure t
+  :defer t
+  :config
+  ;; Setting work on to easily switch between environments
+  (setenv "WORKON_HOME" (expand-file-name "~/bigjackCN/envs/"))
+  ;; Restart the python process when switching environments
+  (add-hook 'pyvenv-post-activate-hooks (lambda ()
+					  (pyvenv-restart-python)))
+  :hook (python-mode . pyvenv-mode))
+
+;; eglot 
+(use-package eglot
   :ensure t
   :config
-  (lsp-enable-which-key-integration t))
+  (add-to-list 'eglot-server-programs '(python-mode . ("pylsp")))
 
-;; Set up before-save hooks to format buffer and add/delete imports.
-;; Make sure you don't have other gofmt/goimports hooks enabled.
-(defun lsp-go-install-save-hooks ()
-  (add-hook 'before-save-hook #'lsp-format-buffer t t)
-  (add-hook 'before-save-hook #'lsp-organize-imports t t))
-(add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+  (setq-default eglot-workspace-configuration
+                '((:pylsp . (:configurationSources ["flake8"] :plugins (:pycodestyle (:enabled nil) :mccabe (:enabled nil) :flake8 (:enabled t))))))
 
-;; Go mode
-(use-package go-mode
-  :ensure t
-  :hook ((go-mode . lsp-deferred)
-	 (go-mode . company-mode))
-  :config
-  (require 'lsp-go)
-  (setq lsp-go-analyses
-	'((fieldalignment . t)
-	  (nilness . t)
-	  (unusedwrite . t)
-	  (unusedparams . t))))
+  :hook (python-mode . eglot-ensure)
+	 (python-mode . company-mode))
+
+;; ;; lsp mode
+;; (use-package lsp-mode
+;;   :ensure t
+;;   :config
+;;   (lsp-enable-which-key-integration t))
+
+;; ;; Set up before-save hooks to format buffer and add/delete imports.
+;; ;; Make sure you don't have other gofmt/goimports hooks enabled.
+;; (defun lsp-go-install-save-hooks ()
+;;   (add-hook 'before-save-hook #'lsp-format-buffer t t)
+;;   (add-hook 'before-save-hook #'lsp-organize-imports t t))
+;; (add-hook 'go-mode-hook #'lsp-go-install-save-hooks)
+
+;; ;; Go mode
+;; (use-package go-mode
+;;   :ensure t
+;;   :hook ((go-mode . lsp-deferred)
+;; 	 (go-mode . company-mode))
+;;   :config
+;;   (require 'lsp-go)
+;;   (setq lsp-go-analyses
+;; 	'((fieldalignment . t)
+;; 	  (nilness . t)
+;; 	  (unusedwrite . t)
+;; 	  (unusedparams . t))))
 
 ;; ----------------------------------------
 ;; END Line
